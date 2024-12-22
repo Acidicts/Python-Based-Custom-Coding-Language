@@ -2,7 +2,7 @@ n = 5
 r = 1
 
 func hi
-    print "hi afsf"+ "hi assf"
+    print "hi afsf " "hi assf"
 funcend
 
 print r
