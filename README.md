@@ -5,3 +5,8 @@
 
 # Future Plans:
 - simplify pygame with it
+
+# How to use:
+- Run the interpt.py file
+`python interpt.py <filename>.acd`
+- The file extension must be .acd
