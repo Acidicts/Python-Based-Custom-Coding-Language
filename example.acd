@@ -1,10 +1,9 @@
-n = 5
-r = 1
+import Game
 
-func hi
-    print "hi afsf " "hi assf"
-funcend
+Game init 600 400 Test
 
-print r
-
-call hi
+while Game is running
+    Game fill 255 0 0
+    Game events
+    Game update
+end

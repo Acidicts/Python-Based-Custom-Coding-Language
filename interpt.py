@@ -1,11 +1,13 @@
 import sys
 import re
+import pygame_addon
 
 
 class Ev:
     def __init__(self):
         self.vars = {}
         self.funcs = {}
+        self.modules = {}
 
     def ev(self, s):
         lines = [x for x in s.split("\n") if x.strip() != ""]
@@ -15,6 +17,11 @@ class Ev:
         while pc < len(lines):
             line = lines[pc]
             match line.split(maxsplit=1)[0]:
+                case 'import':
+                    module_name = line.split(maxsplit=1)[1]
+                    if module_name == "Game":
+                        self.modules[module_name] = pygame_addon.Game(self)
+                        pc += 1
                 case 'while':
                     if self.ev_expr(line.split(maxsplit=1)[1]):
                         pc += 1
@@ -53,9 +60,18 @@ class Ev:
                     pcl = pc + 1
                     pc = self.funcs[func_name]
                 case _:
-                    (name, _, expr) = line.split(maxsplit=2)
-                    self.vars[name] = self.ev_expr(expr)
-                    pc += 1
+                    unknown = True
+                    for module in self.modules:
+                        if line.split()[0] == module:
+                            self.modules[module].ev(line)
+                            unknown = False
+                            pc += 1
+                            break
+
+                    if unknown:
+                        (name, _, expr) = line.split(maxsplit=2)
+                        self.vars[name] = self.ev_expr(expr)
+                        pc += 1
 
     def ev_expr(self, s):
         toks = s.split()
@@ -67,15 +83,36 @@ class Ev:
             elif tok in self.vars:
                 stack.append(self.vars[tok])
             else:
-                rhs = stack.pop()
-                lhs = stack.pop()
+                try:
+                    rhs = stack.pop()
+                    lhs = stack.pop()
+                except IndexError:
+                    rhs = 0
+                    lhs = 0
 
-                if tok == "+": stack.append(lhs + rhs)
-                elif tok == "*": stack.append(lhs * rhs)
-                elif tok == "-": stack.append(lhs - rhs)
-                elif tok == ">=": stack.append(int(lhs >= rhs))
-                elif tok == "<=": stack.append(int(lhs <= rhs))
+                if tok in self.modules:
+                    if "Game" in tok:
+                        return self.modules[tok].ev(s)
+
+                else:
+                    if tok == "+":
+                        stack.append(lhs + rhs)
+                    elif tok == "*":
+                        stack.append(lhs * rhs)
+                    elif tok == "-":
+                        stack.append(lhs - rhs)
+                    elif tok == ">=":
+                        stack.append(int(lhs >= rhs))
+                    elif tok == "<=":
+                        stack.append(int(lhs <= rhs))
+                    elif tok == "==":
+                        stack.append(int(lhs == rhs))
+                    elif tok == "true":
+                        stack.append(1)
+                    elif tok == "false":
+                        stack.append(0)
 
         return stack[0]
+
 
 Ev().ev(open(sys.argv[1]).read())
