@@ -6,6 +6,7 @@ Game sprite add 0 0 blue
 
 while Game is running
     Game fill 255 0 0
+
     Game events
     Game draw
     Game update

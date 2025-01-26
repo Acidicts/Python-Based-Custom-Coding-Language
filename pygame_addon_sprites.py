@@ -9,8 +9,11 @@ class Sprite():
         self.rect.x = int(x)
         self.rect.y = int(y)
 
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
+    def draw(self, screen, x=None, y=None):
+        if x is None and y is None:
+            screen.blit(self.image, self.rect)
+        else:
+            screen.blit(self.image, (int(x), int(y)))
 
     def update(self):
         pass

@@ -45,6 +45,10 @@ class Game:
                 self.add_sprite(line)
             case 'update':
                 self.update()
+            case 'move':
+                sprite = self.sprites[int(line.split()[3])]
+                sprite.rect.x += int(line.split()[4])
+                sprite.rect.y += int(line.split()[5])
             case _:
                 print("Unknown command")
 
