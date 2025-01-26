@@ -1,5 +1,6 @@
-
 import pygame
+from pygame_addon_sprites import *
+
 
 class Game:
     def __init__(self, ev):
@@ -22,14 +23,29 @@ class Game:
                 except Exception as e:
                     print(e)
                     pass
+            case 'sprite':
+                self.sprite(line)
             case 'events':
                 self.events()
             case 'is':
                 return self.vars(line)
             case 'fill':
                 self.fill(line)
+            case 'draw':
+                self.draw()
+            case 'add':
+                self.add_sprite(line)
             case _:
                 print(line.split(maxsplit=1)[1])
+                print("Unknown command")
+
+    def sprite(self, line):
+        match line.split()[2]:
+            case 'add':
+                self.add_sprite(line)
+            case 'update':
+                self.update()
+            case _:
                 print("Unknown command")
 
     def vars(self, line):
@@ -56,6 +72,21 @@ class Game:
         print(f"Game initialized with size ( {w} x {h} )")
         print(" ")
 
+    def draw(self):
+        for sprite in self.sprites:
+            sprite.draw(self.screen)
+
+    def update(self):
+        for sprite in self.sprites:
+            sprite.update()
+
+    def add_sprite(self, line):
+        print(line.split)
+        x = line.split()[3]
+        y = line.split()[4]
+        colour = line.split()[5]
+        self.sprites.append(Sprite(colour, x, y))
+
     def events(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -63,5 +94,5 @@ class Game:
 
     def fill(self, line):
         colour = line.split(maxsplit=2)[2]
-        print(colour)
+        colour = (int(colour.split()[0]), int(colour.split()[1]), int(colour.split()[2]))
         self.screen.fill(colour)
