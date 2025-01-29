@@ -35,9 +35,36 @@ class Game:
                 self.draw()
             case 'add':
                 self.add_sprite(line)
+            case 'wasd':
+                self.wasd()
+            case 'space':
+                keys = pygame.key.get_pressed()
+                for sprite in self.sprites:
+                    if sprite.type == "Player" and keys[pygame.K_SPACE] and sprite.jump:
+                        sprite.jump = False
+                        sprite.move(pygame.math.Vector2(0, -100))
+            case 'clock':
+                self.clock.tick(int(line.split()[2]))
             case _:
                 print(line.split(maxsplit=1)[1])
                 print("Unknown command")
+
+    def wasd(self):
+        for sprite in self.sprites:
+            if sprite.type == "Player":
+                self.wasd_move(sprite)
+
+    @staticmethod
+    def wasd_move(sprite):
+        keys = pygame.key.get_pressed()
+        vec = pygame.math.Vector2(0, 0)
+        vec.x = keys[pygame.K_d] - keys[pygame.K_a]
+        vec.y = keys[pygame.K_s] - keys[pygame.K_w]
+
+        if vec.length() > 0:
+            vec.normalize_ip()
+
+        sprite.wasd(vec)
 
     def sprite(self, line):
         match line.split()[2]:
@@ -47,8 +74,11 @@ class Game:
                 self.update()
             case 'move':
                 sprite = self.sprites[int(line.split()[3])]
-                sprite.rect.x += int(line.split()[4])
-                sprite.rect.y += int(line.split()[5])
+                if sprite.type != "Player":
+                    sprite.rect.x += int(line.split()[4])
+                    sprite.rect.y += int(line.split()[5])
+                else:
+                    sprite.move(pygame.math.Vector2(int(line.split()[4]), int(line.split()[5])))
             case _:
                 print("Unknown command")
 
@@ -82,14 +112,27 @@ class Game:
 
     def update(self):
         for sprite in self.sprites:
-            sprite.update()
+            sprite.update(self)
 
     def add_sprite(self, line):
-        print(line.split)
-        x = line.split()[3]
-        y = line.split()[4]
-        colour = line.split()[5]
-        self.sprites.append(Sprite(colour, x, y))
+        if line.split()[6] == "Collide":
+            x = line.split()[3]
+            y = line.split()[4]
+            type = line.split()[6]
+            colour = line.split()[5]
+            self.sprites.append(Collide(colour, x, y, type))
+        elif line.split()[6] == "Player":
+            x = line.split()[3]
+            y = line.split()[4]
+            type = line.split()[6]
+            colour = line.split()[5]
+            self.sprites.append(Player(colour, x, y, type, self))
+        else:
+            x = line.split()[3]
+            y = line.split()[4]
+            type = line.split()[6]
+            colour = line.split()[5]
+            self.sprites.append(Sprite(colour, x, y, type))
 
     def events(self):
         for event in pygame.event.get():

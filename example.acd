@@ -2,11 +2,25 @@ import Game
 
 Game init 600 400 Test
 
-Game sprite add 0 0 blue
+Game sprite add 0 0 blue Player True
+
+Game sprite add 0 300 green Collide False
+Game sprite add 32 300 green Collide False
+Game sprite add 64 300 green Collide False
+Game sprite add 96 300 green Collide False
+Game sprite add 128 300 green Collide False
+
+Game sprite add 192 250 green Collide False
 
 while Game is running
-    Game fill 255 0 0
+    Game clock 60
 
+    Game fill 255 0 0
+    Game wasd
+    Game space
+
+    Game sprite update
+    Game sprite move 0 0 5
     Game events
     Game draw
     Game update
